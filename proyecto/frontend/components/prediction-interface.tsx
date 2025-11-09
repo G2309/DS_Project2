@@ -1,11 +1,30 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Upload, AlertCircle, CheckCircle, Loader, Info, TrendingUp } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+
+// Dynamic import para cornerstone
+let cornerstone: any = null
+let cornerstoneWADOImageLoader: any = null
+
+if (typeof window !== 'undefined') {
+  import('cornerstone-core').then((cs) => {
+    cornerstone = cs.default
+  })
+  import('cornerstone-wado-image-loader').then((loader) => {
+    cornerstoneWADOImageLoader = loader.default
+    import('dicom-parser').then((dicomParser) => {
+      if (cornerstoneWADOImageLoader && cornerstone) {
+        cornerstoneWADOImageLoader.external.cornerstone = cornerstone
+        cornerstoneWADOImageLoader.external.dicomParser = dicomParser.default
+      }
+    })
+  })
+}
 
 interface VertebraePrediction {
   prob: number
@@ -41,21 +60,87 @@ export default function PredictionInterface() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [loadingPreview, setLoadingPreview] = useState(false)
   const [prediction, setPrediction] = useState<DetailedPrediction | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const processDicomFile = async (file: File) => {
+    setLoadingPreview(true)
+    try {
+      // Esperar a que cornerstone esté cargado
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      if (!cornerstone || !cornerstoneWADOImageLoader) {
+        throw new Error('Cornerstone not loaded')
+      }
+
+      const arrayBuffer = await file.arrayBuffer()
+      const uint8Array = new Uint8Array(arrayBuffer)
+      const blob = new Blob([uint8Array], { type: 'application/dicom' })
+      const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(blob)
+      
+      const image = await cornerstone.loadImage(imageId)
+      
+      if (canvasRef.current) {
+        const canvas = canvasRef.current
+        canvas.width = image.width
+        canvas.height = image.height
+        
+        const context = canvas.getContext('2d')
+        if (context) {
+          const imageData = context.createImageData(image.width, image.height)
+          const pixelData = image.getPixelData()
+          
+          // Normalizar y convertir a escala de grises
+          let min = Infinity
+          let max = -Infinity
+          for (let i = 0; i < pixelData.length; i++) {
+            if (pixelData[i] < min) min = pixelData[i]
+            if (pixelData[i] > max) max = pixelData[i]
+          }
+          
+          const range = max - min
+          for (let i = 0; i < pixelData.length; i++) {
+            const normalizedValue = ((pixelData[i] - min) / range) * 255
+            const index = i * 4
+            imageData.data[index] = normalizedValue
+            imageData.data[index + 1] = normalizedValue
+            imageData.data[index + 2] = normalizedValue
+            imageData.data[index + 3] = 255
+          }
+          
+          context.putImageData(imageData, 0, 0)
+          
+          const dataUrl = canvas.toDataURL('image/png')
+          setPreview(dataUrl)
+        }
+      }
+    } catch (err) {
+      console.error('Error processing DICOM:', err)
+      setPreview('dicom-placeholder')
+    } finally {
+      setLoadingPreview(false)
+    }
+  }
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       setSelectedFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
       setPrediction(null)
       setError(null)
+      
+      if (file.name.endsWith('.dcm')) {
+        await processDicomFile(file)
+      } else {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setPreview(reader.result as string)
+        }
+        reader.readAsDataURL(file)
+      }
     }
   }
 
@@ -228,9 +313,38 @@ export default function PredictionInterface() {
                   <CardTitle className="text-primary">Vista Previa</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden border border-primary/20">
-                    <img src={preview} alt="Preview" className="w-full h-full object-contain" />
-                  </div>
+                  {loadingPreview ? (
+                    <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center">
+                      <div className="text-center">
+                        <Loader className="w-10 h-10 text-primary animate-spin mx-auto mb-3" />
+                        <p className="text-muted-foreground">Procesando DICOM...</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center">
+                      {preview === 'dicom-placeholder' ? (
+                        <div className="text-center p-6">
+                          <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                            <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <p className="text-primary font-semibold text-lg mb-2">Archivo DICOM Cargado</p>
+                          <p className="text-muted-foreground text-sm">{selectedFile?.name}</p>
+                          <p className="text-muted-foreground text-xs mt-2">
+                            Tamaño: {((selectedFile?.size || 0) / 1024).toFixed(2)} KB
+                          </p>
+                          <p className="text-xs text-primary/60 mt-4">
+                            No se pudo procesar la vista previa
+                          </p>
+                        </div>
+                      ) : (
+                        <img src={preview} alt="Preview" className="w-full h-full object-contain" />
+                      )}
+                    </div>
+                  )}
+                  {/* Canvas oculto para procesar DICOM */}
+                  <canvas ref={canvasRef} style={{ display: 'none' }} />
                 </CardContent>
               </Card>
             )}

@@ -14,7 +14,6 @@ export default function Navigation({ currentPage, setCurrentPage }: NavigationPr
     { id: "dashboard", label: "Dashboard", icon: BarChart3, color: "text-primary" },
     { id: "fractures", label: "Fractures", icon: AlertTriangle, color: "text-accent" },
     { id: "predict", label: "Predictions", icon: Upload, color: "text-primary" },
-    { id: "research", label: "Research", icon: FileText, color: "text-accent" },
   ]
 
   return (
