@@ -89,26 +89,26 @@ export default function PredictionInterface() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-white p-6 pt-24">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-4xl font-bold text-cyan-400 mb-2">Spine Fracture Prediction</h2>
-          <p className="text-cyan-300/70">Upload a cervical spine imaging study for AI-assisted analysis</p>
+          <h2 className="text-4xl font-bold text-primary mb-2">Spine Fracture Prediction</h2>
+          <p className="text-muted-foreground">Upload a cervical spine imaging study for AI-assisted analysis</p>
         </div>
 
         <div className="grid gap-6">
           {/* Upload Area */}
-          <Card className="bg-slate-800/50 border-cyan-500/20">
+          <Card className="border-primary/20 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-cyan-400">Upload Image</CardTitle>
-              <CardDescription className="text-cyan-300/50">DICOM, JPG, or PNG format</CardDescription>
+              <CardTitle className="text-primary">Upload Image</CardTitle>
+              <CardDescription>DICOM, JPG, or PNG format</CardDescription>
             </CardHeader>
             <CardContent>
               <div
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                className="border-2 border-dashed border-cyan-500/30 rounded-lg p-12 text-center cursor-pointer hover:border-cyan-500/60 hover:bg-cyan-500/5 transition-all"
+                className="border-2 border-dashed border-primary/30 rounded-lg p-12 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-all"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input
@@ -118,15 +118,15 @@ export default function PredictionInterface() {
                   onChange={handleFileSelect}
                   className="hidden"
                 />
-                <Upload className="w-12 h-12 text-cyan-400/50 mx-auto mb-3" />
-                <p className="text-cyan-300 font-medium">Drag and drop your image here</p>
-                <p className="text-cyan-300/50 text-sm mt-1">or click to browse</p>
+                <Upload className="w-12 h-12 text-primary/50 mx-auto mb-3" />
+                <p className="text-foreground font-medium">Drag and drop your image here</p>
+                <p className="text-muted-foreground text-sm mt-1">or click to browse</p>
               </div>
 
               {selectedFile && (
-                <div className="mt-4 p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
-                  <p className="text-sm text-cyan-300/70">
-                    Selected: <span className="text-cyan-300 font-semibold">{selectedFile.name}</span>
+                <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                  <p className="text-sm text-foreground/75">
+                    Selected: <span className="text-primary font-semibold">{selectedFile.name}</span>
                   </p>
                 </div>
               )}
@@ -137,12 +137,12 @@ export default function PredictionInterface() {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Image Preview */}
             {preview && (
-              <Card className="bg-slate-800/50 border-cyan-500/20">
+              <Card className="border-primary/20 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-cyan-400">Image Preview</CardTitle>
+                  <CardTitle className="text-primary">Image Preview</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative w-full h-80 bg-slate-900/50 rounded-lg overflow-hidden border border-cyan-500/20">
+                  <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden border border-primary/20">
                     <img src={preview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-contain" />
                   </div>
                 </CardContent>
@@ -152,35 +152,33 @@ export default function PredictionInterface() {
             {/* Main Results */}
             {prediction && (
               <Card
-                className={`bg-slate-800/50 border-2 ${
-                  prediction.fracture ? "border-red-500/40" : "border-emerald-500/40"
+                className={`border-2 shadow-sm ${
+                  prediction.fracture ? "border-red-300 bg-red-50/50" : "border-accent/40 bg-accent/5"
                 }`}
               >
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     {prediction.fracture ? (
                       <>
-                        <AlertCircle className="w-5 h-5 text-red-400" />
-                        <span className="text-red-400">Fracture Detected</span>
+                        <AlertCircle className="w-5 h-5 text-red-600" />
+                        <span className="text-red-600">Fracture Detected</span>
                       </>
                     ) : (
                       <>
-                        <CheckCircle className="w-5 h-5 text-emerald-400" />
-                        <span className="text-emerald-400">No Fracture</span>
+                        <CheckCircle className="w-5 h-5 text-accent" />
+                        <span className="text-accent">No Fracture</span>
                       </>
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-slate-900/50 p-4 rounded-lg">
-                    <p className="text-cyan-300/70 text-sm mb-2">Model Confidence</p>
+                  <div className="bg-white p-4 rounded-lg border border-primary/20">
+                    <p className="text-foreground/70 text-sm mb-2 font-medium">Model Confidence</p>
                     <div className="flex items-end gap-3">
-                      <div className="text-3xl font-bold text-cyan-400">
-                        {(prediction.confidence * 100).toFixed(1)}%
-                      </div>
-                      <div className="flex-1 bg-slate-700/50 rounded-full h-3 overflow-hidden">
+                      <div className="text-3xl font-bold text-primary">{(prediction.confidence * 100).toFixed(1)}%</div>
+                      <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all"
+                          className="bg-gradient-to-r from-primary to-accent h-full transition-all"
                           style={{ width: `${prediction.confidence * 100}%` }}
                         />
                       </div>
@@ -188,24 +186,24 @@ export default function PredictionInterface() {
                   </div>
 
                   {prediction.severity && (
-                    <div className="bg-slate-900/50 p-4 rounded-lg">
-                      <p className="text-cyan-300/70 text-sm mb-2">Severity Level</p>
+                    <div className="bg-white p-4 rounded-lg border border-primary/20">
+                      <p className="text-foreground/70 text-sm mb-2 font-medium">Severity Level</p>
                       <div
                         className={`inline-block px-4 py-2 rounded-lg ${
                           prediction.severity === "Severe"
-                            ? "bg-red-500/20 border border-red-500/40"
+                            ? "bg-red-100 border border-red-300"
                             : prediction.severity === "Moderate"
-                              ? "bg-orange-500/20 border border-orange-500/40"
-                              : "bg-emerald-500/20 border border-emerald-500/40"
+                              ? "bg-orange-100 border border-orange-300"
+                              : "bg-accent/20 border border-accent/40"
                         }`}
                       >
                         <p
                           className={`font-semibold ${
                             prediction.severity === "Severe"
-                              ? "text-red-300"
+                              ? "text-red-700"
                               : prediction.severity === "Moderate"
-                                ? "text-orange-300"
-                                : "text-emerald-300"
+                                ? "text-orange-700"
+                                : "text-accent"
                           }`}
                         >
                           {prediction.severity}
@@ -214,24 +212,24 @@ export default function PredictionInterface() {
                     </div>
                   )}
 
-                  <div className="bg-slate-900/50 p-3 rounded-lg border border-cyan-500/20">
-                    <p className="text-cyan-300/70 text-xs mb-2">Key Metrics</p>
+                  <div className="bg-white p-3 rounded-lg border border-primary/20">
+                    <p className="text-foreground/70 text-xs mb-2 font-medium">Key Metrics</p>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-cyan-300/60">Model:</span>
-                        <span className="text-cyan-300 font-semibold">Vision Transformer</span>
+                        <span className="text-foreground/60">Model:</span>
+                        <span className="text-foreground/90 font-semibold">Vision Transformer</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-cyan-300/60">Sensitivity:</span>
-                        <span className="text-cyan-300 font-semibold">93.5%</span>
+                        <span className="text-foreground/60">Sensitivity:</span>
+                        <span className="text-foreground/90 font-semibold">93.5%</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-cyan-300/60">Specificity:</span>
-                        <span className="text-cyan-300 font-semibold">98.9%</span>
+                        <span className="text-foreground/60">Specificity:</span>
+                        <span className="text-foreground/90 font-semibold">98.9%</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-cyan-300/60">Time:</span>
-                        <span className="text-cyan-300 font-semibold">{new Date().toLocaleTimeString()}</span>
+                        <span className="text-foreground/60">Time:</span>
+                        <span className="text-foreground/90 font-semibold">{new Date().toLocaleTimeString()}</span>
                       </div>
                     </div>
                   </div>
@@ -242,36 +240,36 @@ export default function PredictionInterface() {
 
           {/* Regional Analysis */}
           {prediction && (
-            <Card className="bg-slate-800/50 border-cyan-500/20">
+            <Card className="border-primary/20 shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-cyan-400">
+                <CardTitle className="flex items-center gap-2 text-primary">
                   <TrendingUp className="w-5 h-5" />
                   Regional Analysis by Vertebra
                 </CardTitle>
-                <CardDescription className="text-cyan-300/50">Fracture probability by spinal region</CardDescription>
+                <CardDescription>Fracture probability by spinal region</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {prediction.regionalAnalysis.map((region, idx) => (
-                    <div key={idx} className="bg-slate-900/50 p-4 rounded-lg border border-cyan-500/10">
+                    <div key={idx} className="bg-white p-4 rounded-lg border border-primary/20">
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <p className="font-semibold text-cyan-300">{region.region}</p>
-                          <p className="text-xs text-cyan-300/60">{region.vertebra}</p>
+                          <p className="font-semibold text-primary">{region.region}</p>
+                          <p className="text-xs text-muted-foreground">{region.vertebra}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-cyan-400">{(region.fractureProb * 100).toFixed(1)}%</p>
-                          <p className="text-xs text-cyan-300/60">
+                          <p className="text-sm font-bold text-primary">{(region.fractureProb * 100).toFixed(1)}%</p>
+                          <p className="text-xs text-muted-foreground">
                             Confidence: {(region.confidence * 100).toFixed(0)}%
                           </p>
                         </div>
                       </div>
-                      <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                         <div
                           className={`h-full transition-all ${
                             region.fractureProb > 0.5
                               ? "bg-gradient-to-r from-red-500 to-orange-500"
-                              : "bg-gradient-to-r from-cyan-500 to-blue-500"
+                              : "bg-gradient-to-r from-primary to-accent"
                           }`}
                           style={{ width: `${region.fractureProb * 100}%` }}
                         />
@@ -287,21 +285,21 @@ export default function PredictionInterface() {
           {prediction && (
             <div className="space-y-4">
               <Alert
-                className={`${prediction.fracture ? "bg-red-500/10 border-red-500/30" : "bg-emerald-500/10 border-emerald-500/30"}`}
+                className={`${prediction.fracture ? "bg-red-50 border-red-300" : "bg-accent/10 border-accent/30"}`}
               >
-                <Info className={`h-4 w-4 ${prediction.fracture ? "text-red-400" : "text-emerald-400"}`} />
-                <AlertDescription className={`${prediction.fracture ? "text-red-300/90" : "text-emerald-300/90"}`}>
+                <Info className={`h-4 w-4 ${prediction.fracture ? "text-red-600" : "text-accent"}`} />
+                <AlertDescription className={`${prediction.fracture ? "text-red-800" : "text-accent/90"}`}>
                   <p className="font-semibold mb-1">Recommended Action:</p>
                   {prediction.recommendedAction}
                 </AlertDescription>
               </Alert>
 
-              <Card className="bg-slate-800/50 border-cyan-500/20">
+              <Card className="border-primary/20 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-cyan-400">Clinical Notes</CardTitle>
+                  <CardTitle className="text-primary">Clinical Notes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-cyan-300/80 leading-relaxed text-sm">{prediction.clinicalNotes}</p>
+                  <p className="text-foreground/80 leading-relaxed text-sm">{prediction.clinicalNotes}</p>
                 </CardContent>
               </Card>
             </div>
@@ -312,7 +310,7 @@ export default function PredictionInterface() {
             <Button
               onClick={handlePredict}
               disabled={!selectedFile || loading}
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white"
+              className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-sm"
             >
               {loading ? (
                 <>
@@ -330,7 +328,7 @@ export default function PredictionInterface() {
                 setPrediction(null)
               }}
               variant="outline"
-              className="border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10"
+              className="border-primary/30 text-primary hover:bg-primary/5"
             >
               Clear
             </Button>

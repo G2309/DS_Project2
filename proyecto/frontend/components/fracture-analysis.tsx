@@ -135,18 +135,18 @@ export default function FractureAnalysis() {
   const fractureRate = ((totalFractures / totalCases) * 100).toFixed(1)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-white p-6 pt-24">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-4xl font-bold text-amber-400 mb-2">Cervical Spine Fracture Analysis</h2>
-          <p className="text-amber-300/70">Comprehensive statistics from RSNA 2022 dataset</p>
+          <h2 className="text-4xl font-bold text-accent mb-2">Cervical Spine Fracture Analysis</h2>
+          <p className="text-muted-foreground">Comprehensive statistics from RSNA 2022 dataset</p>
         </div>
 
-        {/* Critical Statistics */}
-        <Alert className="mb-8 bg-red-500/10 border-red-500/30">
-          <AlertCircle className="h-4 w-4 text-red-400" />
-          <AlertDescription className="text-red-300/90">
+        {/* Critical Statistics Alert */}
+        <Alert className="mb-8 bg-red-50 border-red-200">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
             High-risk finding: C5 vertebra shows highest fracture incidence (55 cases) with significant recovery time
             required. Multi-level fractures are present in 23% of cases.
           </AlertDescription>
@@ -154,55 +154,55 @@ export default function FractureAnalysis() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-slate-800/50 border-amber-500/20 hover:border-amber-500/40 transition-colors">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-amber-400 text-sm">
+              <CardTitle className="flex items-center gap-2 text-accent text-sm">
                 <Zap className="w-4 h-4" />
                 Total Fractures
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-amber-300">{totalFractures}</div>
-              <p className="text-xs text-amber-300/50 mt-1">{fractureRate}% of dataset</p>
+              <div className="text-3xl font-bold text-accent">{totalFractures}</div>
+              <p className="text-xs text-muted-foreground mt-1">{fractureRate}% of dataset</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-amber-500/20 hover:border-amber-500/40 transition-colors">
+          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-blue-400 text-sm">
+              <CardTitle className="flex items-center gap-2 text-primary text-sm">
                 <Users className="w-4 h-4" />
                 Avg Recovery Time
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-300">44</div>
-              <p className="text-xs text-blue-300/50 mt-1">Days across all levels</p>
+              <div className="text-3xl font-bold text-primary">44</div>
+              <p className="text-xs text-muted-foreground mt-1">Days across all levels</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-amber-500/20 hover:border-amber-500/40 transition-colors">
+          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-purple-400 text-sm">
+              <CardTitle className="flex items-center gap-2 text-primary text-sm">
                 <TrendingDown className="w-4 h-4" />
                 Highest Risk Level
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-300">C5</div>
-              <p className="text-xs text-purple-300/50 mt-1">55 fracture cases</p>
+              <div className="text-3xl font-bold text-primary">C5</div>
+              <p className="text-xs text-muted-foreground mt-1">55 fracture cases</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-amber-500/20 hover:border-amber-500/40 transition-colors">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-cyan-400 text-sm">
+              <CardTitle className="flex items-center gap-2 text-accent text-sm">
                 <AlertCircle className="w-4 h-4" />
                 Neurological Deficit
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-cyan-300">18.8%</div>
-              <p className="text-xs text-cyan-300/50 mt-1">With some level deficit</p>
+              <div className="text-3xl font-bold text-accent">18.8%</div>
+              <p className="text-xs text-muted-foreground mt-1">With some level deficit</p>
             </CardContent>
           </Card>
         </div>
@@ -210,66 +210,66 @@ export default function FractureAnalysis() {
         {/* Analysis Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Vertebra-specific statistics */}
-          <Card className="bg-slate-800/50 border-amber-500/20">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-amber-400">Fracture Distribution by Vertebra</CardTitle>
-              <CardDescription className="text-amber-300/50">C1-C7 vertebrae case counts</CardDescription>
+              <CardTitle className="text-accent">Fracture Distribution by Vertebra</CardTitle>
+              <CardDescription>C1-C7 vertebrae case counts</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={vertebraStats}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(251, 191, 36, 0.1)" />
-                  <XAxis dataKey="name" stroke="rgba(251, 191, 36, 0.5)" />
-                  <YAxis stroke="rgba(251, 191, 36, 0.5)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(251, 191, 36, 0.3)",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#fbbf24" }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
                   />
-                  <Legend wrapperStyle={{ color: "rgba(251, 191, 36, 0.7)" }} />
-                  <Bar dataKey="fractures" fill="#ef4444" name="Fractures" />
-                  <Bar dataKey="healthy" fill="#10b981" name="Healthy" />
+                  <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
+                  <Bar dataKey="fractures" fill="hsl(var(--destructive))" name="Fractures" />
+                  <Bar dataKey="healthy" fill="hsl(var(--accent))" name="Healthy" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
           {/* Age distribution */}
-          <Card className="bg-slate-800/50 border-amber-500/20">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-amber-400">Age Distribution of Cases</CardTitle>
-              <CardDescription className="text-amber-300/50">Fracture incidence by age group</CardDescription>
+              <CardTitle className="text-accent">Age Distribution of Cases</CardTitle>
+              <CardDescription>Fracture incidence by age group</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={ageDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(251, 191, 36, 0.1)" />
-                  <XAxis dataKey="age" stroke="rgba(251, 191, 36, 0.5)" />
-                  <YAxis stroke="rgba(251, 191, 36, 0.5)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="age" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(251, 191, 36, 0.3)",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#fbbf24" }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
                   />
-                  <Legend wrapperStyle={{ color: "rgba(251, 191, 36, 0.7)" }} />
-                  <Bar dataKey="fractures" fill="#ef4444" name="Fractures" />
-                  <Bar dataKey="healthy" fill="#3b82f6" name="Healthy" />
+                  <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
+                  <Bar dataKey="fractures" fill="hsl(var(--destructive))" name="Fractures" />
+                  <Bar dataKey="healthy" fill="hsl(var(--primary))" name="Healthy" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
           {/* Injury cause pie chart */}
-          <Card className="bg-slate-800/50 border-amber-500/20">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-amber-400">Injury Cause Distribution</CardTitle>
-              <CardDescription className="text-amber-300/50">Primary mechanisms of injury</CardDescription>
+              <CardTitle className="text-accent">Injury Cause Distribution</CardTitle>
+              <CardDescription>Primary mechanisms of injury</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -290,11 +290,11 @@ export default function FractureAnalysis() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(251, 191, 36, 0.3)",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#fbbf24" }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -302,10 +302,10 @@ export default function FractureAnalysis() {
           </Card>
 
           {/* Severity distribution */}
-          <Card className="bg-slate-800/50 border-amber-500/20">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-amber-400">Fracture Severity Breakdown</CardTitle>
-              <CardDescription className="text-amber-300/50">Distribution by severity level</CardDescription>
+              <CardTitle className="text-accent">Fracture Severity Breakdown</CardTitle>
+              <CardDescription>Distribution by severity level</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -326,11 +326,11 @@ export default function FractureAnalysis() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(251, 191, 36, 0.3)",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#fbbf24" }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -338,10 +338,10 @@ export default function FractureAnalysis() {
           </Card>
 
           {/* Neurological outcomes */}
-          <Card className="bg-slate-800/50 border-amber-500/20">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-amber-400">Neurological Outcomes</CardTitle>
-              <CardDescription className="text-amber-300/50">Patient outcome distribution</CardDescription>
+              <CardTitle className="text-accent">Neurological Outcomes</CardTitle>
+              <CardDescription>Patient outcome distribution</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -362,11 +362,11 @@ export default function FractureAnalysis() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(251, 191, 36, 0.3)",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#fbbf24" }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -374,61 +374,61 @@ export default function FractureAnalysis() {
           </Card>
 
           {/* Treatment outcomes */}
-          <Card className="bg-slate-800/50 border-amber-500/20">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-amber-400">Treatment Success Rates</CardTitle>
-              <CardDescription className="text-amber-300/50">Recovery rates by treatment type</CardDescription>
+              <CardTitle className="text-accent">Treatment Success Rates</CardTitle>
+              <CardDescription>Recovery rates by treatment type</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={treatmentOutcomes}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(251, 191, 36, 0.1)" />
-                  <XAxis dataKey="treatment" stroke="rgba(251, 191, 36, 0.5)" />
-                  <YAxis stroke="rgba(251, 191, 36, 0.5)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="treatment" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(251, 191, 36, 0.3)",
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#fbbf24" }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
                   />
-                  <Legend wrapperStyle={{ color: "rgba(251, 191, 36, 0.7)" }} />
-                  <Bar dataKey="recovery" fill="#10b981" name="Recovery %" />
+                  <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
+                  <Bar dataKey="recovery" fill="hsl(var(--accent))" name="Recovery %" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
           {/* Risk factors table */}
-          <Card className="bg-slate-800/50 border-amber-500/20 lg:col-span-2">
+          <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow lg:col-span-2">
             <CardHeader>
-              <CardTitle className="text-amber-400">Morbidity Risk Factors</CardTitle>
-              <CardDescription className="text-amber-300/50">Factors affecting patient outcomes</CardDescription>
+              <CardTitle className="text-accent">Morbidity Risk Factors</CardTitle>
+              <CardDescription>Factors affecting patient outcomes</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-amber-500/20">
-                      <th className="text-left p-3 text-amber-400">Risk Factor</th>
-                      <th className="text-center p-3 text-amber-300/70">Impact %</th>
-                      <th className="text-center p-3 text-amber-300/70">Risk Level</th>
+                    <tr className="border-b border-accent/20">
+                      <th className="text-left p-3 text-accent font-semibold">Risk Factor</th>
+                      <th className="text-center p-3 text-foreground/70">Impact %</th>
+                      <th className="text-center p-3 text-foreground/70">Risk Level</th>
                     </tr>
                   </thead>
                   <tbody>
                     {morbidityRiskFactors.map((factor, index) => (
-                      <tr key={index} className="border-b border-amber-500/10">
-                        <td className="p-3 text-amber-300/70">{factor.factor}</td>
-                        <td className="text-center p-3 font-semibold text-amber-300">{factor.percentage}%</td>
+                      <tr key={index} className="border-b border-accent/10">
+                        <td className="p-3 text-foreground/75">{factor.factor}</td>
+                        <td className="text-center p-3 font-semibold text-accent">{factor.percentage}%</td>
                         <td className="text-center p-3">
                           <span
                             className={`px-2 py-1 rounded text-xs font-semibold ${
                               factor.risk === "Very High"
-                                ? "bg-red-500/20 text-red-300"
+                                ? "bg-red-100 text-red-700"
                                 : factor.risk === "High"
-                                  ? "bg-orange-500/20 text-orange-300"
-                                  : "bg-yellow-500/20 text-yellow-300"
+                                  ? "bg-orange-100 text-orange-700"
+                                  : "bg-yellow-100 text-yellow-700"
                             }`}
                           >
                             {factor.risk}
@@ -444,31 +444,31 @@ export default function FractureAnalysis() {
         </div>
 
         {/* Vertebra Details */}
-        <Card className="bg-slate-800/50 border-amber-500/20">
+        <Card className="border-accent/20 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle className="text-amber-400">Detailed Vertebra Statistics</CardTitle>
-            <CardDescription className="text-amber-300/50">Individual vertebra analysis</CardDescription>
+            <CardTitle className="text-accent">Detailed Vertebra Statistics</CardTitle>
+            <CardDescription>Individual vertebra analysis</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-amber-500/20">
-                    <th className="text-left p-3 text-amber-400">Vertebra</th>
-                    <th className="text-center p-3 text-amber-300/70">Fractures</th>
-                    <th className="text-center p-3 text-amber-300/70">Common Type</th>
-                    <th className="text-center p-3 text-amber-300/70">Avg Age</th>
-                    <th className="text-center p-3 text-amber-300/70">Avg Recovery</th>
+                  <tr className="border-b border-accent/20">
+                    <th className="text-left p-3 text-accent font-semibold">Vertebra</th>
+                    <th className="text-center p-3 text-foreground/70">Fractures</th>
+                    <th className="text-center p-3 text-foreground/70">Common Type</th>
+                    <th className="text-center p-3 text-foreground/70">Avg Age</th>
+                    <th className="text-center p-3 text-foreground/70">Avg Recovery</th>
                   </tr>
                 </thead>
                 <tbody>
                   {vertebraStats.map((stat, index) => (
-                    <tr key={index} className="border-b border-amber-500/10">
-                      <td className="p-3 font-semibold text-amber-300">{stat.name}</td>
-                      <td className="text-center p-3 text-amber-300/70">{stat.fractures}</td>
-                      <td className="text-center p-3 text-amber-300/70">{stat.commonType}</td>
-                      <td className="text-center p-3 text-amber-300/70">{stat.ageAvg}</td>
-                      <td className="text-center p-3 text-amber-300/70">{stat.recoveryDays} days</td>
+                    <tr key={index} className="border-b border-accent/10">
+                      <td className="p-3 font-semibold text-accent">{stat.name}</td>
+                      <td className="text-center p-3 text-foreground/75">{stat.fractures}</td>
+                      <td className="text-center p-3 text-foreground/75">{stat.commonType}</td>
+                      <td className="text-center p-3 text-foreground/75">{stat.ageAvg}</td>
+                      <td className="text-center p-3 text-foreground/75">{stat.recoveryDays} days</td>
                     </tr>
                   ))}
                 </tbody>
