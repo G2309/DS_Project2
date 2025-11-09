@@ -7,27 +7,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload, AlertCircle, CheckCircle, Loader, Info, TrendingUp } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
+interface VertebraePrediction {
+  prob: number
+  label: number
+}
+
+interface BackendResponse {
+  predictions: {
+    [key: string]: VertebraePrediction
+  }
+  status: string
+}
+
 interface RegionalAnalysis {
   region: string
   vertebra: string
   fractureProb: number
   confidence: number
+  hasFracture: boolean
 }
 
 interface DetailedPrediction {
   fracture: boolean
-  confidence: number
-  severity?: string
+  fractureCount: number
   regionalAnalysis: RegionalAnalysis[]
   recommendedAction: string
   clinicalNotes: string
 }
+
+const BACKEND_URL = "http://localhost:8000"
 
 export default function PredictionInterface() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [prediction, setPrediction] = useState<DetailedPrediction | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +55,59 @@ export default function PredictionInterface() {
       }
       reader.readAsDataURL(file)
       setPrediction(null)
+      setError(null)
+    }
+  }
+
+  const processBackendResponse = (data: BackendResponse): DetailedPrediction => {
+    const vertebraeOrder = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
+    const regionalAnalysis: RegionalAnalysis[] = []
+    let fractureCount = 0
+
+    vertebraeOrder.forEach((vertebra, idx) => {
+      const pred = data.predictions[vertebra]
+      const hasFracture = pred.label === 1
+      if (hasFracture) fractureCount++
+
+      let region = ''
+      if (idx <= 1) region = 'Upper Cervical'
+      else if (idx <= 3) region = 'Mid-Upper Cervical'
+      else if (idx <= 5) region = 'Mid-Lower Cervical'
+      else region = 'Lower Cervical'
+
+      regionalAnalysis.push({
+        region,
+        vertebra,
+        fractureProb: pred.prob,
+        confidence: pred.prob,
+        hasFracture
+      })
+    })
+
+    const fracture = fractureCount > 0
+
+    let recommendedAction = ''
+    let clinicalNotes = ''
+
+    if (!fracture) {
+      recommendedAction = "No fracturas detectadas. Continuar con monitoreo de rutina."
+      clinicalNotes = "Alineación cervical normal. No se identificaron líneas de fractura aguda en ninguna vértebra."
+    } else if (fractureCount === 1) {
+      const fracturedVertebra = regionalAnalysis.find(r => r.hasFracture)?.vertebra
+      recommendedAction = `Fractura detectada en ${fracturedVertebra}. Se recomienda revisión clínica inmediata y considerar confirmación por TC.`
+      clinicalNotes = `Presencia de disrupción cortical en ${fracturedVertebra} con posible edema de tejidos blandos asociado. Recomendar inmovilización pendiente de evaluación adicional.`
+    } else {
+      const fracturedVertebrae = regionalAnalysis.filter(r => r.hasFracture).map(r => r.vertebra).join(', ')
+      recommendedAction = `Múltiples fracturas detectadas (${fracturedVertebrae}). Atención urgente requerida. Consulta con neurocirugía inmediata.`
+      clinicalNotes = `Fracturas múltiples identificadas en ${fracturedVertebrae}. Patrón de lesión compleja que requiere evaluación multidisciplinaria urgente. Alto riesgo de inestabilidad cervical.`
+    }
+
+    return {
+      fracture,
+      fractureCount,
+      regionalAnalysis,
+      recommendedAction,
+      clinicalNotes
     }
   }
 
@@ -47,28 +115,37 @@ export default function PredictionInterface() {
     if (!selectedFile) return
 
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 2500))
+    setError(null)
 
-    // Mock prediction with detailed regional analysis
-    const isFracture = Math.random() > 0.65
-    setPrediction({
-      fracture: isFracture,
-      confidence: Math.random() * 0.1 + 0.88,
-      severity: isFracture ? (Math.random() > 0.6 ? "Severe" : "Moderate") : "None",
-      regionalAnalysis: [
-        { region: "Upper", vertebra: "C1-C2", fractureProb: 0.12, confidence: 0.94 },
-        { region: "Mid-Upper", vertebra: "C3-C4", fractureProb: isFracture ? 0.78 : 0.08, confidence: 0.91 },
-        { region: "Mid-Lower", vertebra: "C5-C6", fractureProb: 0.15, confidence: 0.93 },
-        { region: "Lower", vertebra: "C7", fractureProb: 0.09, confidence: 0.95 },
-      ],
-      recommendedAction: isFracture
-        ? "Immediate clinical review recommended. Consider CT confirmation and neurosurgery consultation."
-        : "No acute findings. Continue routine monitoring.",
-      clinicalNotes: isFracture
-        ? "Presence of cortical disruption with associated soft tissue swelling. Recommend immobilization pending further evaluation."
-        : "Normal cervical spine alignment. No acute fracture lines identified.",
-    })
-    setLoading(false)
+    try {
+      const formData = new FormData()
+      formData.append('file', selectedFile)
+      formData.append('threshold', '0.5')
+
+      const response = await fetch(`${BACKEND_URL}/predict`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status}`)
+      }
+
+      const data: BackendResponse = await response.json()
+
+      if (data.status !== 'success') {
+        throw new Error('Error en la predicción')
+      }
+
+      const processedPrediction = processBackendResponse(data)
+      setPrediction(processedPrediction)
+
+    } catch (err) {
+      console.error('Error:', err)
+      setError(err instanceof Error ? err.message : 'Error al procesar la imagen')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -93,16 +170,16 @@ export default function PredictionInterface() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-4xl font-bold text-primary mb-2">Spine Fracture Prediction</h2>
-          <p className="text-muted-foreground">Upload a cervical spine imaging study for AI-assisted analysis</p>
+          <h2 className="text-4xl font-bold text-primary mb-2">Predicción de Fractura Cervical</h2>
+          <p className="text-muted-foreground">Sube una imagen DICOM de la columna cervical para identificar fracturas</p>
         </div>
 
         <div className="grid gap-6">
           {/* Upload Area */}
           <Card className="border-primary/20 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-primary">Upload Image</CardTitle>
-              <CardDescription>DICOM, JPG, or PNG format</CardDescription>
+              <CardTitle className="text-primary">Subir Imagen DICOM</CardTitle>
+              <CardDescription>Formato .dcm solamente</CardDescription>
             </CardHeader>
             <CardContent>
               <div
@@ -114,21 +191,30 @@ export default function PredictionInterface() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*,.dcm"
+                  accept=".dcm"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
                 <Upload className="w-12 h-12 text-primary/50 mx-auto mb-3" />
-                <p className="text-foreground font-medium">Drag and drop your image here</p>
-                <p className="text-muted-foreground text-sm mt-1">or click to browse</p>
+                <p className="text-foreground font-medium">Arrastra tu archivo DICOM aquí</p>
+                <p className="text-muted-foreground text-sm mt-1">o haz clic para buscar</p>
               </div>
 
               {selectedFile && (
                 <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
                   <p className="text-sm text-foreground/75">
-                    Selected: <span className="text-primary font-semibold">{selectedFile.name}</span>
+                    Archivo seleccionado: <span className="text-primary font-semibold">{selectedFile.name}</span>
                   </p>
                 </div>
+              )}
+
+              {error && (
+                <Alert className="mt-4 bg-red-50 border-red-300">
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertDescription className="text-red-800">
+                    {error}
+                  </AlertDescription>
+                </Alert>
               )}
             </CardContent>
           </Card>
@@ -139,11 +225,11 @@ export default function PredictionInterface() {
             {preview && (
               <Card className="border-primary/20 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-primary">Image Preview</CardTitle>
+                  <CardTitle className="text-primary">Vista Previa</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden border border-primary/20">
-                    <img src={preview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-contain" />
+                    <img src={preview} alt="Preview" className="w-full h-full object-contain" />
                   </div>
                 </CardContent>
               </Card>
@@ -161,74 +247,43 @@ export default function PredictionInterface() {
                     {prediction.fracture ? (
                       <>
                         <AlertCircle className="w-5 h-5 text-red-600" />
-                        <span className="text-red-600">Fracture Detected</span>
+                        <span className="text-red-600">Fractura Detectada</span>
                       </>
                     ) : (
                       <>
                         <CheckCircle className="w-5 h-5 text-accent" />
-                        <span className="text-accent">No Fracture</span>
+                        <span className="text-accent">Sin Fracturas</span>
                       </>
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="bg-white p-4 rounded-lg border border-primary/20">
-                    <p className="text-foreground/70 text-sm mb-2 font-medium">Model Confidence</p>
-                    <div className="flex items-end gap-3">
-                      <div className="text-3xl font-bold text-primary">{(prediction.confidence * 100).toFixed(1)}%</div>
-                      <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
-                        <div
-                          className="bg-gradient-to-r from-primary to-accent h-full transition-all"
-                          style={{ width: `${prediction.confidence * 100}%` }}
-                        />
+                    <p className="text-foreground/70 text-sm mb-2 font-medium">Resultado del Análisis</p>
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl font-bold text-primary">
+                        {prediction.fracture ? `${prediction.fractureCount} Fractura${prediction.fractureCount > 1 ? 's' : ''}` : 'Normal'}
                       </div>
                     </div>
                   </div>
 
-                  {prediction.severity && (
-                    <div className="bg-white p-4 rounded-lg border border-primary/20">
-                      <p className="text-foreground/70 text-sm mb-2 font-medium">Severity Level</p>
-                      <div
-                        className={`inline-block px-4 py-2 rounded-lg ${
-                          prediction.severity === "Severe"
-                            ? "bg-red-100 border border-red-300"
-                            : prediction.severity === "Moderate"
-                              ? "bg-orange-100 border border-orange-300"
-                              : "bg-accent/20 border border-accent/40"
-                        }`}
-                      >
-                        <p
-                          className={`font-semibold ${
-                            prediction.severity === "Severe"
-                              ? "text-red-700"
-                              : prediction.severity === "Moderate"
-                                ? "text-orange-700"
-                                : "text-accent"
-                          }`}
-                        >
-                          {prediction.severity}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
                   <div className="bg-white p-3 rounded-lg border border-primary/20">
-                    <p className="text-foreground/70 text-xs mb-2 font-medium">Key Metrics</p>
+                    <p className="text-foreground/70 text-xs mb-2 font-medium">Información del Modelo</p>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-foreground/60">Model:</span>
-                        <span className="text-foreground/90 font-semibold">Vision Transformer</span>
+                        <span className="text-foreground/60">Modelo:</span>
+                        <span className="text-foreground/90 font-semibold">DeiT Base</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-foreground/60">Sensitivity:</span>
-                        <span className="text-foreground/90 font-semibold">93.5%</span>
+                        <span className="text-foreground/60">Vértebras:</span>
+                        <span className="text-foreground/90 font-semibold">C1-C7</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-foreground/60">Specificity:</span>
-                        <span className="text-foreground/90 font-semibold">98.9%</span>
+                        <span className="text-foreground/60">Umbral:</span>
+                        <span className="text-foreground/90 font-semibold">0.5</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-foreground/60">Time:</span>
+                        <span className="text-foreground/60">Hora:</span>
                         <span className="text-foreground/90 font-semibold">{new Date().toLocaleTimeString()}</span>
                       </div>
                     </div>
@@ -244,30 +299,39 @@ export default function PredictionInterface() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-primary">
                   <TrendingUp className="w-5 h-5" />
-                  Regional Analysis by Vertebra
+                  Análisis por Vértebra
                 </CardTitle>
-                <CardDescription>Fracture probability by spinal region</CardDescription>
+                <CardDescription>Probabilidad de fractura en cada vértebra cervical</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {prediction.regionalAnalysis.map((region, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-lg border border-primary/20">
+                    <div key={idx} className={`p-4 rounded-lg border ${
+                      region.hasFracture 
+                        ? 'bg-red-50 border-red-300' 
+                        : 'bg-white border-primary/20'
+                    }`}>
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <p className="font-semibold text-primary">{region.region}</p>
-                          <p className="text-xs text-muted-foreground">{region.vertebra}</p>
+                          <p className={`font-semibold ${region.hasFracture ? 'text-red-600' : 'text-primary'}`}>
+                            {region.vertebra}
+                            {region.hasFracture && <span className="ml-2 text-xs font-bold">⚠️ FRACTURA</span>}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{region.region}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-primary">{(region.fractureProb * 100).toFixed(1)}%</p>
+                          <p className={`text-sm font-bold ${region.hasFracture ? 'text-red-600' : 'text-primary'}`}>
+                            {(region.fractureProb * 100).toFixed(1)}%
+                          </p>
                           <p className="text-xs text-muted-foreground">
-                            Confidence: {(region.confidence * 100).toFixed(0)}%
+                            Probabilidad
                           </p>
                         </div>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                         <div
                           className={`h-full transition-all ${
-                            region.fractureProb > 0.5
+                            region.hasFracture
                               ? "bg-gradient-to-r from-red-500 to-orange-500"
                               : "bg-gradient-to-r from-primary to-accent"
                           }`}
@@ -289,14 +353,14 @@ export default function PredictionInterface() {
               >
                 <Info className={`h-4 w-4 ${prediction.fracture ? "text-red-600" : "text-accent"}`} />
                 <AlertDescription className={`${prediction.fracture ? "text-red-800" : "text-accent/90"}`}>
-                  <p className="font-semibold mb-1">Recommended Action:</p>
+                  <p className="font-semibold mb-1">Acción Recomendada:</p>
                   {prediction.recommendedAction}
                 </AlertDescription>
               </Alert>
 
               <Card className="border-primary/20 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-primary">Clinical Notes</CardTitle>
+                  <CardTitle className="text-primary">Notas Clínicas</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-foreground/80 leading-relaxed text-sm">{prediction.clinicalNotes}</p>
@@ -315,10 +379,10 @@ export default function PredictionInterface() {
               {loading ? (
                 <>
                   <Loader className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing...
+                  Analizando...
                 </>
               ) : (
-                "Run Prediction"
+                "Ejecutar Predicción"
               )}
             </Button>
             <Button
@@ -326,11 +390,12 @@ export default function PredictionInterface() {
                 setSelectedFile(null)
                 setPreview(null)
                 setPrediction(null)
+                setError(null)
               }}
               variant="outline"
               className="border-primary/30 text-primary hover:bg-primary/5"
             >
-              Clear
+              Limpiar
             </Button>
           </div>
         </div>

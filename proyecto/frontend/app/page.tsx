@@ -21,7 +21,7 @@ export default function Home() {
         {currentPage === "dashboard" && <Dashboard />}
         {currentPage === "fractures" && <FractureAnalysis />}
         {currentPage === "predict" && <PredictionInterface />}
-        {currentPage === "research" && <ResearchInfo />}
+       
       </main>
 
       {/* Footer */}
