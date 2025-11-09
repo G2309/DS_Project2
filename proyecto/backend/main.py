@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import pickle
-import numpy as np
-from typing import List, Optional
+from typing import Dict, Optional
+import os
+import tempfile
+from functions_model import load_deit_from_pkl, predict_single, VERTEBRAE_LABELS
 
-app = FastAPI(title="ML Model API", version="1.0.0")
+app = FastAPI(title="DICOM Vertebrae Classification API", version="1.0.0")
 
 # CORS middleware
 app.add_middleware(
@@ -16,31 +17,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global variable to store loaded model
+# Global variables
 model = None
+device = None
+MODEL_PATH = "deit_best_model.pkl"
 
-# Pydantic models for request/response
-class PredictionRequest(BaseModel):
-    features: List[float]
-
+# Pydantic models
 class PredictionResponse(BaseModel):
-    prediction: float
+    predictions: Dict[str, Dict[str, float]]
     status: str
 
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool
+    vertebrae_labels: list
 
 # Load model on startup
 @app.on_event("startup")
 async def load_model():
-    global model
+    global model, device
     try:
-        with open("model.pkl", "rb") as f:
-            model = pickle.load(f)
-        print("Model loaded successfully")
-    except FileNotFoundError:
-        print("Warning: model.pkl not found. Please add your model file.")
+        if not os.path.exists(MODEL_PATH):
+            print(f"Warning: {MODEL_PATH} not found. Please add your model file.")
+            return
+        
+        model, device = load_deit_from_pkl(MODEL_PATH)
+        print(f"Model loaded successfully on device: {device}")
     except Exception as e:
         print(f"Error loading model: {e}")
 
@@ -49,56 +51,89 @@ async def root():
     """Health check endpoint"""
     return {
         "status": "running",
-        "model_loaded": model is not None
+        "model_loaded": model is not None,
+        "vertebrae_labels": VERTEBRAE_LABELS
     }
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """Detailed health check"""
     return {
-        "status": "healthy",
-        "model_loaded": model is not None
+        "status": "healthy" if model is not None else "model not loaded",
+        "model_loaded": model is not None,
+        "vertebrae_labels": VERTEBRAE_LABELS
     }
 
 @app.post("/predict", response_model=PredictionResponse)
-async def predict(request: PredictionRequest):
-    """Make prediction using loaded model"""
+async def predict(
+    file: UploadFile = File(...),
+    threshold: Optional[float] = 0.5
+):
+    """
+    Recibe un archivo DICOM y retorna las predicciones de las vértebras
+    
+    Parameters:
+    - file: Archivo DICOM (.dcm)
+    - threshold: Umbral de clasificación (default: 0.5)
+    """
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
     
+    # Validar extensión del archivo
+    if not file.filename.endswith('.dcm'):
+        raise HTTPException(status_code=400, detail="File must be a DICOM (.dcm) file")
+    
     try:
-        # Convert features to numpy array
-        features_array = np.array(request.features).reshape(1, -1)
+        # Guardar archivo temporalmente
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.dcm') as tmp_file:
+            contents = await file.read()
+            tmp_file.write(contents)
+            tmp_path = tmp_file.name
         
-        # Make prediction
-        prediction = model.predict(features_array)[0]
+        # Hacer predicción
+        result = predict_single(tmp_path, model, device, threshold=threshold)
+        
+        # Limpiar archivo temporal
+        os.unlink(tmp_path)
         
         return {
-            "prediction": float(prediction),
+            "predictions": result,
+            "status": "success"
+        }
+    
+    except Exception as e:
+        # Limpiar archivo temporal en caso de error
+        if 'tmp_path' in locals() and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+
+@app.post("/predict-path")
+async def predict_from_path(
+    dicom_path: str,
+    threshold: Optional[float] = 0.5
+):
+    """
+    Hacer predicción desde una ruta local (para testing)
+    
+    Parameters:
+    - dicom_path: Ruta al archivo DICOM
+    - threshold: Umbral de clasificación (default: 0.5)
+    """
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    
+    if not os.path.exists(dicom_path):
+        raise HTTPException(status_code=404, detail="DICOM file not found")
+    
+    try:
+        result = predict_single(dicom_path, model, device, threshold=threshold)
+        
+        return {
+            "predictions": result,
             "status": "success"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
-
-@app.post("/predict-batch")
-async def predict_batch(requests: List[PredictionRequest]):
-    """Make batch predictions"""
-    if model is None:
-        raise HTTPException(status_code=503, detail="Model not loaded")
-    
-    try:
-        features_list = [req.features for req in requests]
-        features_array = np.array(features_list)
-        
-        predictions = model.predict(features_array)
-        
-        return {
-            "predictions": [float(p) for p in predictions],
-            "count": len(predictions),
-            "status": "success"
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch prediction error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
