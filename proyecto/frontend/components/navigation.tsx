@@ -12,7 +12,6 @@ export default function Navigation({ currentPage, setCurrentPage }: NavigationPr
   const navItems = [
     { id: "home", label: "Home", icon: Home, color: "text-primary" },
     { id: "dashboard", label: "Dashboard", icon: BarChart3, color: "text-primary" },
-    { id: "fractures", label: "Fracturas", icon: AlertTriangle, color: "text-accent" },
     { id: "predict", label: "Prediccion", icon: Upload, color: "text-primary" },
   ]
 
