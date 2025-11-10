@@ -20,9 +20,9 @@ import { Activity, TrendingUp, Target } from "lucide-react"
 
 // Sample data - Replace with your actual data
 const modelAccuracyData = [
-  { model: "ResNet50", accuracy: 94.2, sensitivity: 92.1, specificity: 95.8 },
-  { model: "EfficientNet", accuracy: 95.7, sensitivity: 94.3, specificity: 96.8 },
-  { model: "Vision Transformer", accuracy: 96.1, sensitivity: 95.2, specificity: 97.1 },
+  { model: "CNN", accuracy: 53.7, f1_score: 52.8, recall: 69},
+  { model: "Mask-R CNN", accuracy: 41.34, f1_score: 58.5, recall: 41.34 },
+  { model: "Vision Transformer", accuracy: 98.9, f1_score: 99.8, recall: 98.6},
 ]
 
 const fractureCasesData = [
@@ -75,7 +75,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-4xl font-bold text-primary mb-2">Model Performance Analytics</h2>
+          <h2 className="text-4xl font-bold text-primary mb-2">Metricas del mejor modelo</h2>
           <p className="text-muted-foreground">RSNA 2022 Cervical Spine Fracture Detection - Comprehensive Analysis</p>
         </div>
 
@@ -85,11 +85,11 @@ export default function Dashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-primary text-sm">
                 <Target className="w-4 h-4" />
-                Best Model Accuracy
+                 Accuracy
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">96.1%</div>
+              <div className="text-3xl font-bold text-primary">98.9%</div>
               <p className="text-xs text-muted-foreground mt-1">Vision Transformer Ensemble</p>
             </CardContent>
           </Card>
@@ -98,12 +98,10 @@ export default function Dashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-accent text-sm">
                 <Activity className="w-4 h-4" />
-                Average Sensitivity
-              </CardTitle>
+                Sensitivity              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-accent">93.9%</div>
-              <p className="text-xs text-muted-foreground mt-1">Across all models</p>
+              <div className="text-3xl font-bold text-accent">98.8%</div>
             </CardContent>
           </Card>
 
@@ -111,11 +109,11 @@ export default function Dashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-primary text-sm">
                 <TrendingUp className="w-4 h-4" />
-                Test Set Size
+                Tamaño de la muestra
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">5,000+</div>
+              <div className="text-3xl font-bold text-primary">2,196+</div>
               <p className="text-xs text-muted-foreground mt-1">CT scan images</p>
             </CardContent>
           </Card>
@@ -172,52 +170,9 @@ export default function Dashboard() {
                     />
                     <Legend wrapperStyle={{ color: "#111827" }} />
                     <Bar dataKey="accuracy" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="sensitivity" fill="#10b981" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="specificity" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="f1_score" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="recall" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                   </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Curva ROC */}
-            <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-primary text-lg">ROC Curve Analysis</CardTitle>
-                <CardDescription>Best performing model - AUC: 0.981</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={rocCurveData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="fpr" stroke="#374151" />
-                    <YAxis stroke="#374151" domain={[0, 1]} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "6px",
-                      }}
-                    />
-                    <Legend wrapperStyle={{ color: "#111827" }} />
-                    {/* Diagonal de referencia */}
-                    <Line
-                      type="linear"
-                      dataKey="fpr"
-                      stroke="#9ca3af"
-                      strokeDasharray="5 5"
-                      dot={false}
-                      name="Baseline (random)"
-                    />
-                    {/* Curva ROC principal */}
-                    <Line
-                      type="monotone"
-                      dataKey="tpr"
-                      stroke="#3b82f6"
-                      strokeWidth={3}
-                      dot={{ r: 2 }}
-                      name="ROC Curve"
-                    />
-                  </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
@@ -256,79 +211,229 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Entrenamiento a lo largo de épocas */}
+            
+          </div>
+          {/* 🔹 Matrices de confusión por modelo */}
+          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-primary text-lg">Matrices de confusión por modelo</CardTitle>
+              <CardDescription>Comparación visual del desempeño entre CNN y Mask R-CNN</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* 🔸 CNN */}
+                <div className="border border-primary/10 rounded-lg bg-white shadow-sm hover:shadow-md transition-all overflow-hidden">
+                  <p className="text-center text-sm font-semibold bg-primary/5 text-primary py-2">
+                    Matriz de Confusión – CNN
+                  </p>
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="p-2"></th>
+                        <th className="text-center text-primary p-2">Pred: No Fx</th>
+                        <th className="text-center text-primary p-2">Pred: Fx</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-2 font-semibold text-foreground">Real: No Fx</td>
+                        <td className="text-center p-2 bg-accent/10 font-semibold">81</td>
+                        <td className="text-center p-2 bg-red-500/10 text-red-600 font-semibold">126</td>
+                      </tr>
+                      <tr>
+                        <td className="p-2 font-semibold text-foreground">Real: Fx</td>
+                        <td className="text-center p-2 bg-red-500/10 text-red-600 font-semibold">61</td>
+                        <td className="text-center p-2 bg-accent/10 font-semibold">136</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 🔸 Mask R-CNN */}
+                <div className="border border-primary/10 rounded-lg bg-white shadow-sm hover:shadow-md transition-all overflow-hidden">
+                  <p className="text-center text-sm font-semibold bg-primary/5 text-primary py-2">
+                    Matriz de Confusión – Mask R-CNN
+                  </p>
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="p-2"></th>
+                        <th className="text-center text-primary p-2">Pred: Background</th>
+                        <th className="text-center text-primary p-2">Pred: Fractured Vertebra</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-2 font-semibold text-foreground">True: Background</td>
+                        <td className="text-center p-2 bg-accent/10 font-semibold">759</td>
+                        <td className="text-center p-2 bg-red-500/10 text-red-600 font-semibold">535</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            </CardContent>
+          </Card>
+
+
+          {/* 🔹 Matrices de confusión por nivel cervical */}
+          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-primary text-lg">Matrices de confusión del ViT (C1–C7)</CardTitle>
+              <CardDescription>Rendimiento a detalle de cada vértebra</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { level: "C1", TN: 1644, FP: 10, FN: 0, TP: 512 },
+                  { level: "C2", TN: 1332, FP: 2, FN: 25, TP: 807 },
+                  { level: "C3", TN: 1623, FP: 1, FN: 20, TP: 522 },
+                  { level: "C4", TN: 1412, FP: 0, FN: 26, TP: 728 },
+                  { level: "C5", TN: 1245, FP: 15, FN: 35, TP: 871 },
+                  { level: "C6", TN: 1148, FP: 12, FN: 3, TP: 1003 },
+                  { level: "C7", TN: 1148, FP: 6, FN: 15, TP: 997 },
+                ].map((m, i) => (
+                  <div
+                    key={i}
+                    className="border border-primary/10 rounded-lg bg-white shadow-sm hover:shadow-md transition-all overflow-hidden"
+                  >
+                    <p className="text-center text-sm font-semibold bg-primary/5 text-primary py-2">
+                      Confusion Matrix – {m.level}
+                    </p>
+                    <table className="w-full text-sm border-collapse">
+                      <thead>
+                        <tr>
+                          <th className="p-2 text-left"></th>
+                          <th className="p-2 text-center text-primary">Pred: Neg</th>
+                          <th className="p-2 text-center text-primary">Pred: Pos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="p-2 font-semibold text-foreground">Actual: Neg</td>
+                          <td className="p-2 text-center bg-accent/10 font-semibold">{m.TN}</td>
+                          <td className="p-2 text-center bg-red-500/10 text-red-600 font-semibold">{m.FP}</td>
+                        </tr>
+                        <tr>
+                          <td className="p-2 font-semibold text-foreground">Actual: Pos</td>
+                          <td className="p-2 text-center bg-red-500/10 text-red-600 font-semibold">{m.FN}</td>
+                          <td className="p-2 text-center bg-accent/10 font-semibold">{m.TP}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 🔹 Métricas por vértebra y curva de entrenamiento */}
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  {/* Tabla de métricas por vértebra */}
+  <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+    <CardHeader>
+      <CardTitle className="text-primary text-lg">Rendimiento por vértebra en el Vision Transformer</CardTitle>
+      <CardDescription>Precision, Recall, F1-score y Accuracy</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead className="bg-primary/10">
+            <tr>
+              <th className="p-3 text-left font-semibold text-primary">Vértebra</th>
+              <th className="p-3 text-center font-semibold text-primary">Precision (%)</th>
+              <th className="p-3 text-center font-semibold text-primary">Recall (%)</th>
+              <th className="p-3 text-center font-semibold text-primary">F1-score (%)</th>
+              <th className="p-3 text-center font-semibold text-primary">Accuracy (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { v: "C1", p: 99.55, r: 99.54, f: 99.54, a: 99.54 },
+              { v: "C2", p: 98.77, r: 98.75, f: 98.75, a: 98.75 },
+              { v: "C3", p: 99.04, r: 99.03, f: 99.02, a: 99.03 },
+              { v: "C4", p: 98.82, r: 98.80, f: 98.79, a: 98.80 },
+              { v: "C5", p: 97.70, r: 97.69, f: 97.69, a: 97.69 },
+              { v: "C6", p: 99.31, r: 99.31, f: 99.31, a: 99.31 },
+              { v: "C7", p: 99.03, r: 99.03, f: 99.03, a: 99.03 },
+            ].map((row, i) => (
+              <tr
+                key={i}
+                className={i % 2 === 0 ? "bg-primary/5" : ""}
+              >
+                <td className="p-2 font-semibold">{row.v}</td>
+                <td className="text-center p-2">{row.p.toFixed(2)}</td>
+                <td className="text-center p-2">{row.r.toFixed(2)}</td>
+                <td className="text-center p-2">{row.f.toFixed(2)}</td>
+                <td className="text-center p-2">{row.a.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </CardContent>
+  </Card>
+
+            {/* Curva de entrenamiento (Train vs Validation Loss) */}
             <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader>
-                <CardTitle className="text-primary text-lg">Training Performance</CardTitle>
-                <CardDescription>Accuracy and loss across 50 epochs</CardDescription>
+                <CardTitle className="text-primary text-lg">Curva de Entrenamiento - DeiT</CardTitle>
+                <CardDescription>Train vs Validation Loss</CardDescription>
               </CardHeader>
               <CardContent className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={performanceOverTime}>
+                  <LineChart
+                    data={[
+                      { epoch: 1, train: 0.44, val: 0.22 },
+                      { epoch: 2, train: 0.29, val: 0.15 },
+                      { epoch: 3, train: 0.20, val: 0.10 },
+                      { epoch: 4, train: 0.14, val: 0.07 },
+                      { epoch: 5, train: 0.12, val: 0.06 },
+                      { epoch: 6, train: 0.10, val: 0.05 },
+                      { epoch: 7, train: 0.09, val: 0.04 },
+                      { epoch: 8, train: 0.08, val: 0.04 },
+                      { epoch: 9, train: 0.07, val: 0.03 },
+                      { epoch: 10, train: 0.07, val: 0.035 },
+                    ]}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="epoch" stroke="#374151" />
-                    <YAxis stroke="#374151" />
-                    <Tooltip />
+                    <XAxis dataKey="epoch" stroke="#374151" label={{ value: "Época", position: "insideBottom", offset: -5 }} />
+                    <YAxis stroke="#374151" label={{ value: "Pérdida (Loss)", angle: -90, position: "insideLeft" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                      }}
+                    />
                     <Legend />
-                    <Line type="monotone" dataKey="accuracy" stroke="#3b82f6" dot={false} />
-                    <Line type="monotone" dataKey="loss" stroke="#ef4444" dot={false} />
+                    <Line
+                      type="monotone"
+                      dataKey="train"
+                      stroke="#f59e0b"
+                      strokeWidth={3}
+                      dot={{ r: 3 }}
+                      name="Train Loss"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="val"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                      dot={{ r: 3 }}
+                      name="Validation Loss"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
 
-          {/* 🔹 Matriz de confusión - fila completa */}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-primary text-lg">Confusion Matrix - Test Set</CardTitle>
-              <CardDescription>Vision Transformer Ensemble Model</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-3 text-primary font-semibold">Actual / Predicted</th>
-                      <th className="text-center p-3 text-primary font-semibold">Fracture</th>
-                      <th className="text-center p-3 text-primary font-semibold">No Fracture</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="p-3 font-semibold text-foreground">Fracture</td>
-                      <td className="text-center p-3 bg-accent/10 text-accent font-semibold rounded">187</td>
-                      <td className="text-center p-3 bg-red-500/10 text-red-600 dark:text-red-400 font-semibold">13</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 font-semibold text-foreground">No Fracture</td>
-                      <td className="text-center p-3 bg-red-500/10 text-red-600 dark:text-red-400 font-semibold">8</td>
-                      <td className="text-center p-3 bg-accent/10 text-accent font-semibold rounded">692</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
 
-              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div className="border border-primary/20 rounded p-4 bg-primary/5">
-                  <p className="text-muted-foreground text-xs font-medium">Sensitivity (Recall)</p>
-                  <p className="text-2xl font-bold text-primary">93.5%</p>
-                </div>
-                <div className="border border-accent/20 rounded p-4 bg-accent/5">
-                  <p className="text-muted-foreground text-xs font-medium">Specificity</p>
-                  <p className="text-2xl font-bold text-accent">98.9%</p>
-                </div>
-                <div className="border border-primary/20 rounded p-4 bg-primary/5">
-                  <p className="text-muted-foreground text-xs font-medium">Precision</p>
-                  <p className="text-2xl font-bold text-primary">96.8%</p>
-                </div>
-                <div className="border border-accent/20 rounded p-4 bg-accent/5">
-                  <p className="text-muted-foreground text-xs font-medium">F1 Score</p>
-                  <p className="text-2xl font-bold text-accent">0.945</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
+
         </div>
 
       </div>
