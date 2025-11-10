@@ -320,6 +320,29 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+          {/* Análisis exploratorio*/}
+          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow lg:col-span-3">
+            <CardHeader>
+                <CardTitle className="text-primary text-lg">Análisis exploratorio</CardTitle>
+                <CardDescription>Plotly interactive visualization</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full h-[750px] rounded-md overflow-hidden border border-primary/10">
+                  <iframe
+                    src="/dashboard_lesiones_final.html" // 👈 debe estar en /public/
+                    title="Confusion Matrices"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      border: "none",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </div>
+              </CardContent>
+
+          </Card>
+          
         </div>
       </div>
     </div>
