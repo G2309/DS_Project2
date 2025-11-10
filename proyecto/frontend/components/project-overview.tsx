@@ -22,16 +22,20 @@ export default function ProjectOverview() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/30 rounded-lg text-primary text-sm font-semibold">
               <Activity className="w-4 h-4" />
-              RSNA 2022 Challenge
+              Desafio RSNA 
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold text-primary text-balance leading-tight">
-              Cervical Spine Fracture Detection
+              Detencion de Fracturas en Columna Cervical
             </h1>
 
             <p className="text-lg text-foreground/70 text-balance max-w-3xl leading-relaxed">
-              A comprehensive deep learning research platform for detecting and localizing cervical spine fractures on
-              CT scans. Advancing clinical decision support through machine learning and medical imaging expertise.
+              El objetivo principal de este proyecto es desarrollar un sistema capaz de identificar
+fracturas cervicales a partir de imágenes médicas, con el fin de determinar de manera
+automática si existe o no una fractura. Este enfoque busca reducir la dependencia
+exclusiva del diagnóstico médico manual, proporcionando una herramienta de apoyo
+que pueda asistir a los especialistas en la toma de decisiones clínicas y agilizar el
+proceso de diagnóstico
             </p>
 
             <div className="flex flex-wrap gap-3 pt-4">
@@ -40,7 +44,7 @@ export default function ProjectOverview() {
                 className="gap-2 bg-primary hover:bg-primary/90 text-white shadow-sm"
                 onClick={() => (window.location.href = "#explore")}
               >
-                Explore Platform <ChevronRight className="w-4 h-4" />
+                Ver la plataforma <ChevronRight className="w-4 h-4" />
               </Button>
               <Button
                 size="lg"
@@ -54,7 +58,7 @@ export default function ProjectOverview() {
                   rel="noopener noreferrer"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Kaggle Competition
+                  Competicion de Kaggle
                 </a>
               </Button>
             </div>
@@ -62,10 +66,7 @@ export default function ProjectOverview() {
 
           {/* Key Statistics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-12 border-t border-primary/10">
-            <div>
-              <p className="text-muted-foreground text-sm mb-2 font-medium">Competition Year</p>
-              <p className="text-3xl font-bold text-primary">2022</p>
-            </div>
+            
             <div>
               <p className="text-muted-foreground text-sm mb-2 font-medium">Participants</p>
               <p className="text-3xl font-bold text-primary">1000+</p>
@@ -89,28 +90,29 @@ export default function ProjectOverview() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary text-2xl">
               <Stethoscope className="w-6 h-6" />
-              Clinical Context
+
+              Situación problemática
+
             </CardTitle>
-            <CardDescription className="text-foreground/60">
-              Understanding cervical spine fractures and the importance of rapid detection
-            </CardDescription>
+            
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-foreground/75 leading-relaxed">
-              Cervical spine fractures represent a critical clinical emergency, accounting for 3-5% of all trauma cases.
-              The cervical spine contains vital neural structures, and fracture-related injuries can result in permanent
-              neurological disability or death if not promptly identified and managed.
+            Las fracturas de las vértebras cervicales son lesiones graves que pueden causar discapacidad permanente o incluso la muerte si no se diagnostican a tiempo.
             </p>
             <p className="text-foreground/75 leading-relaxed">
-              The RSNA 2022 Cervical Spine Fracture Detection Challenge aims to advance machine learning applications in
-              medical imaging by developing algorithms that can accurately and rapidly detect fractures on CT scans,
-              supporting radiologists in clinical decision-making and improving patient outcomes.
+              Los hospitales reciben grandes volúmenes de radiografías de pacientes con trauma cervical, pero el diagnóstico depende del criterio humano del radiólogo, lo que genera:
+              <ul>
+                <li>Retrasos en la atención</li>
+                <li>Subjetividad en la interpretación.</li>
+                <li>Riesgo de pasar por alto fracturas sutiles.</li>
+              </ul>
+              
             </p>
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mt-4">
               <p className="text-foreground/80 text-sm">
-                <span className="font-semibold text-primary">Clinical Significance:</span> Timely and accurate detection
-                is essential for appropriate triage, treatment planning, and preventing serious complications including
-                spinal cord injury and neurological deterioration.
+                <span className="font-semibold text-primary">Problema científico:</span> ¿Es posible entrenar un modelo de visión artificial que detecte y clasifique fracturas en radiografías cervicales de forma confiable, reduciendo el tiempo de diagnóstico y los errores humanos?
+
               </p>
             </div>
           </CardContent>
@@ -121,55 +123,44 @@ export default function ProjectOverview() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-accent text-2xl">
               <Target className="w-6 h-6" />
-              Research Objectives
+              Objetivos
             </CardTitle>
-            <CardDescription className="text-foreground/60">Key goals for this research initiative</CardDescription>
+            <CardDescription className="text-foreground/60">Desarrollar un modelo de aprendizaje automático que identifique fracturas en radiografías de vértebras cervicales, para apoyar diagnósticos más rápidos y precisos.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="border border-accent/20 rounded-lg p-4 bg-accent/5 hover:border-accent/40 transition-colors">
                 <h4 className="font-semibold text-accent mb-2 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" />
-                  High Diagnostic Accuracy
+                   Dataset RSNA
                 </h4>
                 <p className="text-foreground/70 text-sm">
-                  Develop ensemble models achieving 95%+ accuracy in detecting presence or absence of cervical spine
-                  fractures across diverse patient populations.
+                  Explorar y describir las características del dataset de radiografías cervicales, identificando patrones, limitaciones y posibles sesgos.
                 </p>
               </div>
 
               <div className="border border-accent/20 rounded-lg p-4 bg-accent/5 hover:border-accent/40 transition-colors">
                 <h4 className="font-semibold text-accent mb-2 flex items-center gap-2">
                   <Brain className="w-4 h-4" />
-                  Vertebra-Level Localization
+                  Preprocesamiento
                 </h4>
                 <p className="text-foreground/70 text-sm">
-                  Accurately localize detected fractures to specific cervical vertebrae (C1-C7) to support clinical
-                  triage and treatment decisions.
+                  Aplicar técnicas de preprocesamiento (reducción de ruido, estandarización de tamaños, balanceo de clases) para optimizar el modelo.
+
                 </p>
               </div>
 
               <div className="border border-accent/20 rounded-lg p-4 bg-accent/5 hover:border-accent/40 transition-colors">
                 <h4 className="font-semibold text-accent mb-2 flex items-center gap-2">
                   <Award className="w-4 h-4" />
-                  Clinical Utility
+                  Redes Neuronales
                 </h4>
                 <p className="text-foreground/70 text-sm">
-                  Ensure model performance on clinical test sets with sensitivity and specificity metrics appropriate
-                  for clinical deployment.
+                  Comparar diferentes arquitecturas de redes neuronales y seleccionar la más prometedora mediante métricas de desempeño relevantes..
                 </p>
               </div>
 
-              <div className="border border-accent/20 rounded-lg p-4 bg-accent/5 hover:border-accent/40 transition-colors">
-                <h4 className="font-semibold text-accent mb-2 flex items-center gap-2">
-                  <Activity className="w-4 h-4" />
-                  Real-Time Performance
-                </h4>
-                <p className="text-foreground/70 text-sm">
-                  Achieve sub-500ms inference time per image for practical integration into clinical imaging workflows
-                  and PACS systems.
-                </p>
-              </div>
+           
             </div>
           </CardContent>
         </Card>
@@ -179,9 +170,8 @@ export default function ProjectOverview() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary text-2xl">
               <Brain className="w-6 h-6" />
-              Research Methodology
+               Algoritmos Utilizados
             </CardTitle>
-            <CardDescription className="text-foreground/60">Technical approach and validation strategy</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
@@ -190,52 +180,19 @@ export default function ProjectOverview() {
                   1
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-1">Data Analysis & Preprocessing</h4>
+                  <h4 className="font-semibold text-foreground mb-1">Vision Transformer (ViT)</h4>
                   <p className="text-foreground/70 text-sm">
-                    Analyzed 5,000+ CT scans from 1,200+ patients with expert radiologist annotations. Applied DICOM
-                    conversion, Hounsfield unit windowing, and multi-scale augmentation strategies.
+                    Un Vision Transformer (ViT) es una arquitectura de deep learning que adapta el
+Transformer diseñado originalmente para texto al campo de visión de imágenes. En
+lugar de convoluciones, un ViT divide la imagen en parches, aplana cada parche y lo
+proyecta linealmente a un espacio de embeddings
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg border border-accent/30 bg-accent/10 flex items-center justify-center text-accent font-semibold text-sm">
-                  2
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">Ensemble Model Architecture</h4>
-                  <p className="text-foreground/70 text-sm">
-                    Integrated three complementary architectures: ResNet50 for robust feature extraction, EfficientNet
-                    for parameter efficiency, and Vision Transformer for global context understanding.
-                  </p>
-                </div>
-              </div>
+          
+         
 
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg border border-primary/30 bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                  3
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">Rigorous Cross-Validation</h4>
-                  <p className="text-foreground/70 text-sm">
-                    Employed stratified 5-fold cross-validation with patient-level data splitting to prevent data
-                    leakage and ensure unbiased performance estimates.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg border border-accent/30 bg-accent/10 flex items-center justify-center text-accent font-semibold text-sm">
-                  4
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">Weighted Ensemble Averaging</h4>
-                  <p className="text-foreground/70 text-sm">
-                    Optimized model weights through Bayesian optimization with temperature scaling for calibrated
-                    confidence scores suitable for clinical decision support.
-                  </p>
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>

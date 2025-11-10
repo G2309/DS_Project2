@@ -12,8 +12,8 @@ export default function Navigation({ currentPage, setCurrentPage }: NavigationPr
   const navItems = [
     { id: "home", label: "Home", icon: Home, color: "text-primary" },
     { id: "dashboard", label: "Dashboard", icon: BarChart3, color: "text-primary" },
-    { id: "fractures", label: "Fractures", icon: AlertTriangle, color: "text-accent" },
-    { id: "predict", label: "Predictions", icon: Upload, color: "text-primary" },
+    { id: "fractures", label: "Fracturas", icon: AlertTriangle, color: "text-accent" },
+    { id: "predict", label: "Prediccion", icon: Upload, color: "text-primary" },
   ]
 
   return (
@@ -26,8 +26,8 @@ export default function Navigation({ currentPage, setCurrentPage }: NavigationPr
               <Brain className="w-5 h-5 md:w-6 md:h-6 text-primary" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg md:text-xl font-bold text-primary">Spine Fracture Detection</h1>
-              <p className="text-xs text-muted-foreground">RSNA 2022 Research</p>
+              <h1 className="text-lg md:text-xl font-bold text-primary">Proyecto 2 Ciencia de Datos</h1>
+              <p className="text-xs text-muted-foreground">RSNA 2022 </p>
             </div>
           </div>
 

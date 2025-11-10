@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Spine AI - RSNA 2022 Research Platform",
+  title: "Proyecto 2 Data Science",
   description:
     "AI-powered cervical spine fracture detection using deep learning and medical imaging analysis. Featuring model analytics, prediction interface, and comprehensive research documentation.",
   generator: "v0.app",
