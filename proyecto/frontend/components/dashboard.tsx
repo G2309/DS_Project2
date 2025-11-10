@@ -122,156 +122,164 @@ export default function Dashboard() {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Model Accuracy Comparison */}
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 gap-6 mb-6">
+
+          {/* 🔹 Análisis exploratorio - fila completa */}
           <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="text-primary text-lg">Model Accuracy Comparison</CardTitle>
-              <CardDescription>Performance across three leading architectures</CardDescription>
+              <CardTitle className="text-primary text-lg">Análisis exploratorio</CardTitle>
+              <CardDescription>Visualización interactiva con Plotly</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={modelAccuracyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="model" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                  <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
-                  <Bar dataKey="accuracy" fill="hsl(var(--primary))" />
-                  <Bar dataKey="sensitivity" fill="hsl(var(--accent))" />
-                  <Bar dataKey="specificity" fill="hsl(var(--muted))" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="w-full h-[750px] rounded-md overflow-hidden border border-primary/10">
+                <iframe
+                  src="/dashboard_lesiones_final.html"
+                  title="Análisis exploratorio de lesiones"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    borderRadius: "8px",
+                  }}
+                />
+              </div>
             </CardContent>
           </Card>
 
-          {/* Fracture Distribution by Vertebra */}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-primary text-lg">Fracture Distribution by Vertebra</CardTitle>
-              <CardDescription>Cervical vertebrae C1-C7 analysis</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={fractureCasesData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                  <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
-                  <Bar dataKey="fractures" fill="hsl(var(--destructive))" />
-                  <Bar dataKey="healthy" fill="hsl(var(--accent))" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {/* 🔹 Gráficos de rendimiento y dataset */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* ROC Curve */}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-primary text-lg">ROC Curve Analysis</CardTitle>
-              <CardDescription>Best performing model - AUC: 0.981</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={rocCurveData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="fpr" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                  <Line type="monotone" dataKey="tpr" stroke="hsl(var(--primary))" dot={false} strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            {/* Comparación de precisión de modelos */}
+            <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-primary text-lg">Model Accuracy Comparison</CardTitle>
+                <CardDescription>Performance across three leading architectures</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={modelAccuracyData} barGap={4}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="model" stroke="#374151" />
+                    <YAxis stroke="#374151" />
+                    <Tooltip
+                      formatter={(value) => [`${value.toFixed(1)}%`, ""]}
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend wrapperStyle={{ color: "#111827" }} />
+                    <Bar dataKey="accuracy" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="sensitivity" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="specificity" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-          {/* Dataset Distribution */}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-primary text-lg">Dataset Split</CardTitle>
-              <CardDescription>Training, validation, and test distribution</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={datasetDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {datasetDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            {/* Curva ROC */}
+            <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-primary text-lg">ROC Curve Analysis</CardTitle>
+                <CardDescription>Best performing model - AUC: 0.981</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={rocCurveData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="fpr" stroke="#374151" />
+                    <YAxis stroke="#374151" domain={[0, 1]} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend wrapperStyle={{ color: "#111827" }} />
+                    {/* Diagonal de referencia */}
+                    <Line
+                      type="linear"
+                      dataKey="fpr"
+                      stroke="#9ca3af"
+                      strokeDasharray="5 5"
+                      dot={false}
+                      name="Baseline (random)"
+                    />
+                    {/* Curva ROC principal */}
+                    <Line
+                      type="monotone"
+                      dataKey="tpr"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                      dot={{ r: 2 }}
+                      name="ROC Curve"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-          {/* Training Performance Over Epochs */}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-primary text-lg">Training Performance</CardTitle>
-              <CardDescription>Accuracy and loss across 50 epochs</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={performanceOverTime}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="epoch" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                  <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
-                  <Line type="monotone" dataKey="accuracy" stroke="hsl(var(--primary))" dot={false} strokeWidth={2} />
-                  <Line type="monotone" dataKey="loss" stroke="hsl(var(--destructive))" dot={false} strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            {/* Distribución del dataset */}
+            <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-primary text-lg">Dataset Split</CardTitle>
+                <CardDescription>Training, validation, and test distribution</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={datasetDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={100}
+                      dataKey="value"
+                    >
+                      {datasetDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-          {/* Confusion Matrix */}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow lg:col-span-2">
+            {/* Entrenamiento a lo largo de épocas */}
+            <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-primary text-lg">Training Performance</CardTitle>
+                <CardDescription>Accuracy and loss across 50 epochs</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={performanceOverTime}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="epoch" stroke="#374151" />
+                    <YAxis stroke="#374151" />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="accuracy" stroke="#3b82f6" dot={false} />
+                    <Line type="monotone" dataKey="loss" stroke="#ef4444" dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 🔹 Matriz de confusión - fila completa */}
+          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="text-primary text-lg">Confusion Matrix - Test Set</CardTitle>
               <CardDescription>Vision Transformer Ensemble Model</CardDescription>
@@ -300,6 +308,7 @@ export default function Dashboard() {
                   </tbody>
                 </table>
               </div>
+
               <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div className="border border-primary/20 rounded p-4 bg-primary/5">
                   <p className="text-muted-foreground text-xs font-medium">Sensitivity (Recall)</p>
@@ -320,30 +329,8 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-          {/* Análisis exploratorio*/}
-          <Card className="border-primary/20 shadow-sm hover:shadow-md transition-shadow lg:col-span-3">
-            <CardHeader>
-                <CardTitle className="text-primary text-lg">Análisis exploratorio</CardTitle>
-                <CardDescription>Plotly interactive visualization</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full h-[750px] rounded-md overflow-hidden border border-primary/10">
-                  <iframe
-                    src="/dashboard_lesiones_final.html" // 👈 debe estar en /public/
-                    title="Confusion Matrices"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      border: "none",
-                      borderRadius: "8px",
-                    }}
-                  />
-                </div>
-              </CardContent>
-
-          </Card>
-          
         </div>
+
       </div>
     </div>
   )
