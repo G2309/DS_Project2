@@ -54,7 +54,7 @@ interface DetailedPrediction {
   clinicalNotes: string
 }
 
-const BACKEND_URL = "http://localhost:8000"
+const BACKEND_URL = "http://44.204.59.62:8000"
 
 export default function PredictionInterface() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
